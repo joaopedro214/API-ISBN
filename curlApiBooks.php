@@ -10,8 +10,8 @@ function buscarLivroPorISBN($isbn10, $isbn13) {
         return "ISBN não recebido.";
     }
 
-    $url = "http://openlibrary.org/api/books?bibkeys=ISBN:" . $isbn . "&format=json&jscmd=data";
-     
+    $url = "http://openlibrary.org/api/books?bibkeys=ISBN:" . $isbn . "&format=json";
+    
     $ch = curl_init();
 
     curl_setopt($ch, CURLOPT_URL, $url);
@@ -22,15 +22,18 @@ function buscarLivroPorISBN($isbn10, $isbn13) {
     if (curl_errno($ch)) { 
         echo 'Erro:' . curl_error($ch); 
     }
-
+    
     curl_close($ch);
 
     $dadosLivro = json_decode($response, true);
-
+    
     if (empty($dadosLivro)) { 
         return "Nenhum dado encontrado para " . $tipoISBN . ": " . $isbn; 
     }
     
-    return $dadosLivro; 
+    $image = $dadosLivro["ISBN:$isbn"]['thumbnail_url'];
+
+    return $image;
+
 }
 ?>
