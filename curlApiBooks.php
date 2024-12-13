@@ -1,6 +1,17 @@
 <?php
-function buscarLivroPorISBN($isbn) { 
-    $url = "http://openlibrary.org/api/books?bibkeys=ISBN:" . $isbn . "&format=json&jscmd=data"; 
+function buscarLivroPorISBN($isbn10, $isbn13) { 
+    if (!empty($isbn10)) {
+        $isbn = $isbn10;
+        $tipoISBN = "isbn-10";
+    } elseif (!empty($isbn13)) {
+        $isbn = $isbn13;
+        $tipoISBN = "isbn-13";
+    } else {
+        return "ISBN não recebido.";
+    }
+
+    $url = "http://openlibrary.org/api/books?bibkeys=ISBN:" . $isbn . "&format=json&jscmd=data";
+     
     $ch = curl_init();
 
     curl_setopt($ch, CURLOPT_URL, $url);
@@ -9,12 +20,17 @@ function buscarLivroPorISBN($isbn) {
     $response = curl_exec($ch);
 
     if (curl_errno($ch)) { 
-        echo 'Erro:' . curl_error($ch);
+        echo 'Erro:' . curl_error($ch); 
     }
 
     curl_close($ch);
 
     $dadosLivro = json_decode($response, true);
+
+    if (empty($dadosLivro)) { 
+        return "Nenhum dado encontrado para " . $tipoISBN . ": " . $isbn; 
+    }
     
-    return $dadosLivro; }
+    return $dadosLivro; 
+}
 ?>
